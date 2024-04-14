@@ -34,7 +34,7 @@ router.get('/user-auth' , token_middleware.requireSignIn,(req,res)=>{
     //console.log(req);
     res.status(200).send({ok:true});
 });
-
+<<<<<<< HEAD
 router.get('/private-user-auth',async (req,res)=>{
     //console.log(req);
     console.log('auth',req.headers.authorization);
@@ -71,7 +71,8 @@ router.get('/private-user-auth',async (req,res)=>{
     }
    
 });
-
+=======
+>>>>>>> b8fa8d541a9066c2be125a4daa08793a5826b409
 router.get('/admin-auth' , token_middleware.requireSignIn,token_middleware.is_admin,(req,res)=>{
     console.log(req);
     res.status(200).send({ok:true});
