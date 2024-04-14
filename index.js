@@ -11,7 +11,7 @@ app.use(express.static('public'));
 const cors = require('cors');
 app.use(cors({origin: process.env.CLIENT_URL})); 
 app.use(cors({
-    origin:["http://localhost:3000","https://thriving-mandazi-2580ba.netlify.app"],
+    origin:["http://localhost:3000","https://e-commerce-apis-8yuv.onrender.com"],
     methods: ['GET','POST','DELETE','UPDATE','PUT','PATCH'],
     credentials:true
 }));
