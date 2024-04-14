@@ -25,7 +25,7 @@ const  update_product = registerControllers.update_product ;
  const all_products = registerControllers.all_products;
  const del_product = registerControllers.del_product;
  const product_by_cat_slug = registerControllers.product_by_cat_slug;
-<<<<<<< HEAD
+
  const filter_products = registerControllers.filter_products;
  const product_sizes = registerControllers.product_sizes;
  const product_images = registerControllers.product_images;
