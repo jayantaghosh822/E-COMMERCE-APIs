@@ -31,11 +31,8 @@ const  update_product = registerControllers.update_product ;
  const product_images = registerControllers.product_images;
  const del_pro_images = registerControllers.del_pro_images;
 const get_product_title = registerControllers.get_product_title;
-=======
-// const delete_category = registerControllers.delete_category;
->>>>>>> b8fa8d541a9066c2be125a4daa08793a5826b409
-// const get_category = registerControllers.get_category;
-// const update_category = registerControllers.update_category;
+
+
 var express = require('express');
 const router = express.Router();
 const storage = multer.diskStorage({
@@ -50,7 +47,7 @@ const storage = multer.diskStorage({
 const uploadStorage = multer({ storage: storage });
 router.get('/all-products',all_products);
 router.get('/get-product',get_product);
-<<<<<<< HEAD
+
 router.get('/get-product/pro_slug/:slug',get_product_by_slug);
 router.get('/product_by_cat_slug',product_by_cat_slug);
 router.get('/filter-products',filter_products);
@@ -61,12 +58,12 @@ router.get('/product-sizes',product_sizes);
 router.get('/get-product-title/:p_id',get_product_title);
 router.post('/del-product-images',del_pro_images);
 router.post('/upload-product-images',uploadStorage.single('file'),product_images);
-=======
+
 router.get('/product_by_cat_slug',get_product);
 router.delete('/product-delete',product_by_cat_slug);
 router.post('/add-product',uploadStorage.single('image'),create_product);
 router.post('/update-product',uploadStorage.single('image'),update_product);
->>>>>>> b8fa8d541a9066c2be125a4daa08793a5826b409
+
 router.get('/get-product-photo/:p_id', async(req,res)=>{
   try{
     console.log(req.params.p_id);
@@ -103,8 +100,5 @@ catch(err){
   console.log(err);
 }
 })
-// router.get('/all-categories',all_category);
-// router.delete('/category-delete',delete_category);
-// router.get('/get-category',get_category);
-// router.put('/update-category',update_category);
+
 module.exports = {router};
