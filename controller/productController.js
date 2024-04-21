@@ -16,6 +16,7 @@ const categoryModel = require('../model/categoryModel.js');
 
 const category = categoryModel.Category;
 
+
 const brandModel = require('../model/brandModel.js');
 const brand = brandModel.Brand;
 
@@ -27,6 +28,7 @@ const sizes = sizeVariants.SizeVariants;
 
 const ProductImagesVariant = require ('../model/ProductImages.js');
 const productImages = ProductImagesVariant.ProductVariantImages;
+
 
 const create_product = async(req,res) =>{
  
@@ -159,6 +161,7 @@ const del_product = async(req,res) =>{
     }
    
  }
+
  const get_product_by_slug = async (req, res) => {
     console.log('slug', req.params.slug);
     let pro_slug = req.params.slug;
@@ -202,6 +205,8 @@ const del_product = async(req,res) =>{
     }
 }
 
+
+
  const update_product = async(req,res) =>{
     let existing_product=null;
     // const form = JSON.parse(req.body.formData);
@@ -228,14 +233,7 @@ if(req.body.formData.slug==""){
 if( (req.body.formData.slug!="") && (req.body.formData.name!="") ){
 // let slug = req.body.formData.slug;
 let name = req.body.formData.name;
-//  existing_product=await product.findOne({slug:req.body.formData.slug});
-// console.log(existing_product);
-// if(existing_product!=null){
-//     return res.status(200).send({
-//         success:false,
-//         messgae:"Product Exists With Same Slug"
-//     })
-// }
+
 console.log("line 45",slug);
 if(slug==null){
    return res.status(200).send({
@@ -253,8 +251,7 @@ if((name==null)||(name=="")){
 console.log("if existing",existing_product);
 if(existing_product==null && req.body.formData.name!=null ){
     console.log("here");
-    // const name = req.body.catname;
-    // const slug = req.body.catslug;
+
    
     if( req.body.formData.shipping == 1){
         req.body.formData.shipping=true;
@@ -267,13 +264,10 @@ if(existing_product==null && req.body.formData.name!=null ){
     let prod_id = req.body.formData._id;
     let updateData="";
     try{
-         // new_product = new product({name,description,slug,price,quan,shipping,category});
-         //  new_product.photo.data = fs.readFileSync(req.file.path);
-         //  new_product.photo.contentType =req.file.mimetype;
+
         
            updateData = {
             name:req.body.formData.name,
-            description:req.body.formData.description,
             slug:req.body.formData.slug,
             price:req.body.formData.price,
             quan:req.body.formData.quan,
@@ -314,11 +308,12 @@ if(existing_product==null && req.body.formData.name!=null ){
         if (!updatedProduct) {
             return res.status(404).json({ error: 'Product not found' });
         }
-        res.status(200).json({ message: 'Product updated successfully', data: updatedProduct });
+        res.status(200).json({ success:true , message: 'Product updated successfully', data: updatedProduct });
     })
     .catch(error => {
         res.status(500).json({ error: 'Internal server error', details: error.message });
     });
+
     if (!(Object.keys(req.body.formData.colors).length === 0)) {
 //         const colorVariants = require('../model/colorVariants.js');
 // const colors = colorVariants.Color;
@@ -408,11 +403,13 @@ if(existing_product==null && req.body.formData.name!=null ){
                 });
         }
     }
+
 }
 }
 
 const product_by_cat_slug = async(req,res)=>{
       const cat_slug = req.headers.cat_slug;
+
       //console.log('my-slug',cat_slug);
       try{
         const get_categories = await category.findOne({slug:cat_slug});
@@ -458,12 +455,6 @@ const filter_products = async(req,res)=>{
 try {
     let query = {};
 
-    // Check if category is present in parsed_query
-    // if (parsed_query.category) {
-    //     query.category = parsed_query.category;
-    // }
-
-    // Check if brands is present in parsed_query
     let productIds="";
     function isObjEmpty (obj) {
         return Object.keys(obj).length === 0;
@@ -576,3 +567,13 @@ catch(error){
 
         }
 module.exports = {create_product,all_products,del_product,get_product,get_product_by_slug,update_product,product_by_cat_slug,filter_products,product_sizes,product_images,del_pro_images,get_product_title};
+
+    // console.log(cat_slug);
+    //   const get_categories = await category.findOne({slug:cat_slug});
+    //   if(get_categories){
+    //   // let cat_id = get_categories._id;
+    //   console.log(get_categories);
+    //   }
+
+
+
