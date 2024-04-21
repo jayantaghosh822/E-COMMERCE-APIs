@@ -32,7 +32,6 @@ const  update_product = registerControllers.update_product ;
  const del_pro_images = registerControllers.del_pro_images;
 const get_product_title = registerControllers.get_product_title;
 
-
 var express = require('express');
 const router = express.Router();
 const storage = multer.diskStorage({
@@ -75,9 +74,9 @@ router.get('/get-product-photo/:p_id', async(req,res)=>{
     console.log(err);
   }
 });
-router.get('/get-product-images/',async(req,res)=>{
+router.get('/get-product-images/:product_id',async(req,res)=>{
 console.log(req.query);
-const pro_id = req.query.pro_id;
+const pro_id = req.params.product_id;
 try{
   //console.log(req.params.p_id);
   //  const  productimages = await productMultipleImages.ProductVariantImages.findOne({_id:pro_id}).select("photo");
@@ -100,5 +99,8 @@ catch(err){
   console.log(err);
 }
 })
-
+// router.get('/all-categories',all_category);
+// router.delete('/category-delete',delete_category);
+// router.get('/get-category',get_category);
+// router.put('/update-category',update_category);
 module.exports = {router};
