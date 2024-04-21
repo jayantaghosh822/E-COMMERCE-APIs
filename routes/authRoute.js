@@ -23,6 +23,7 @@ const my_user = registerControllers.my_user;
 const my_user_delete = registerControllers.my_user_del;
 const user_address = registerControllers.user_address;
 const save_user_address = registerControllers.save_user_address;
+const edit_user_account = registerControllers.editmyaccount;
 var express = require('express');
 const router = express.Router();
 router.post('/register',my_controller);
@@ -34,43 +35,43 @@ router.get('/user-auth' , token_middleware.requireSignIn,(req,res)=>{
     //console.log(req);
     res.status(200).send({ok:true});
 });
+router.post('/edit-user-account/:user_id' , token_middleware.requireSignIn ,edit_user_account );
+// router.get('/private-user-auth',async (req,res)=>{
+//     //console.log(req);
+//     console.log('auth',req.headers.authorization);
+//     try{
+//        // console.log(req.headers.authorization);
+//        console.log(process.env.TOKEN_SECRET);
+//         if(req.headers.authorization){
+//         const user_jwt = JWT.verify(req.headers.authorization,process.env.TOKEN_SECRET);
+//         console.log('the-header',req.headers.authorization);
 
-router.get('/private-user-auth',async (req,res)=>{
-    //console.log(req);
-    console.log('auth',req.headers.authorization);
-    try{
-       // console.log(req.headers.authorization);
-       console.log(process.env.TOKEN_SECRET);
-        if(req.headers.authorization){
-        const user_jwt = JWT.verify(req.headers.authorization,process.env.TOKEN_SECRET);
-        console.log('the-header',req.headers.authorization);
-
-        let userX = await user.findById(user_jwt._id).select('email');
-        //console.log(userX);
-        if(userX){
-            req.user = userX;
-            res.status(200).send({ok:true});
-        }
+//         let userX = await user.findById(user_jwt._id).select('email');
+//         //console.log(userX);
+//         if(userX){
+//             req.user = userX;
+//             res.status(200).send({ok:true});
+//         }
 
 
-        }
-        else{
-            res.status(201).send({
-                success:false,
-                message:"empty token",
-            })
-        }
+//         }
+//         else{
+//             res.status(201).send({
+//                 success:false,
+//                 message:"empty token",
+//             })
+//         }
     
-    }
-    catch(err){
-        res.status(201).send({
-            success:false,
-            message:"token error",
-        })
-        console.log(err);
-    }
+//     }
+//     catch(err){
+//         res.status(201).send({
+//             success:false,
+//             message:"token error",
+//         })
+//         console.log(err);
+//     }
    
-});
+// });
 
 router.get('/admin-auth' , token_middleware.requireSignIn,token_middleware.is_admin,(req,res)=>{
     console.log(req);
@@ -109,6 +110,6 @@ router.post('/set-password', async (req, res) => {
         console.log(error);
     }
 });
-router.get('/user-details/',my_user);
+router.get('/user-details/:user_id',token_middleware.requireSignIn,my_user);
 router.delete('/user-delete/',my_user_delete);
 module.exports = {router};
