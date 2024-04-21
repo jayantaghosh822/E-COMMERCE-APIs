@@ -29,10 +29,11 @@ const registerController = async(req,res) => {
 //  console.log(name);
 //  console.log(email);
 const role = 2;
+const displayname = firstname;
  let newuser="";
 if(!existing_user){
 
-newuser = await new user({firstname,lastname,email,password,phone,role}).save();
+newuser = await new user({firstname,lastname,email,displayname,password,phone,role}).save();
 
 res.status(201).send({
   success:true,
