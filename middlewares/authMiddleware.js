@@ -27,6 +27,7 @@ try{
     let userX = await User.findById(user._id).select('email');
     //console.log(userX);
     req.user = userX;
+    if(userX._id == user._id)
      next();
     }
     else{
