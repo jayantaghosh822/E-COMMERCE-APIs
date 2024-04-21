@@ -28,7 +28,7 @@ const registerController = async(req,res) => {
  const {firstname,lastname,email,password,phone} = req.body;
 //  console.log(name);
 //  console.log(email);
-
+const role = 2;
  let newuser="";
 if(!existing_user){
 
