@@ -21,22 +21,19 @@ const user = userModel.User;
 const usesrAddressModel = require('../model/addressModel.js');
 const address = usesrAddressModel.UserAddress;
 const registerController = async(req,res) => {
-//console.log("controller");
 
-    //console.log(req.body);
  existing_user=await user.findOne({email:req.body.email});
  console.log(existing_user);
 
- const {name,email,password,phone,address} = req.body;
- console.log(name);
- console.log(email);
- const role = 2;
- console.log(role);
+ const {firstname,lastname,email,password,phone} = req.body;
+//  console.log(name);
+//  console.log(email);
+
  let newuser="";
 if(!existing_user){
 
-newuser = await new user({name,email,password,phone,address,role}).save();
-console.log(newuser);
+newuser = await new user({firstname,lastname,email,password,phone,role}).save();
+
 res.status(201).send({
   success:true,
   message:"user registered",
@@ -49,14 +46,6 @@ else{
     message: "User aready exist with this email address"});
   // res.send('All is good!');
 }
-// user.name = 'argha';
-// user.email = "fsdf@gmail.com";
-// user.password = "abcc";
-// user.phone = "654646545";
-// user.address = "sdgsdsgsdg";
-// const doc = await user.save();
-
-
 
 }
 
@@ -93,7 +82,7 @@ try {
         success:true,
         message:"user logedin",
         user:{
-        name:my_user.name,
+        name:my_user.displayname,
         email:my_user.email,
         id:my_user._id,
         token:token,
@@ -196,7 +185,7 @@ const all_users = async(req,res) =>{
 }
 
 const my_user = async(req,res)=>{
-  const user_id = req.headers.user_id;
+  const user_id = req.params.user_id;
   console.log(req.headers.user_id);
  const my_user = await user.findOne({ _id: user_id }); 
   console.log(my_user);
@@ -239,6 +228,7 @@ const save_user_address = async(req,res)=>{
       const update_user = await address.findByIdAndUpdate(finduseraddress._id,{firstname,lastname,streetAddress1,streetAddress2,city,state,zip,phone,country,email},{ new: true });
       if(update_user){
         return res.status(200).send({
+          success:true,
           message:"address updated successfully"
         })
       }
@@ -249,6 +239,7 @@ const save_user_address = async(req,res)=>{
       if(register_address){
         console.log(register_address);
         return res.status(200).send({
+          success:true,
           message:"address saved successfully"
         })
       }
@@ -261,4 +252,18 @@ const save_user_address = async(req,res)=>{
     })
   }
 }
-module.exports = { registerController , get_user_by_id ,login ,test_controller,verify_email,password_link,all_users,my_user,my_user_del,user_address,save_user_address };
+
+const editmyaccount = async(req , res) =>{
+console.log(req.body);
+const userid = req.params.user_id;
+const {email , password , firstname , lastname, displayname} = req.body;
+const user_details = await user.findByIdAndUpdate(userid, {email , password , firstname , lastname, displayname}, { new: true });
+if(user_details){
+  console.log(user_details);
+  return res.status(200).send({
+    success:true,
+    message:"account updated successfully"
+  })
+}
+}
+module.exports = { registerController , get_user_by_id ,login ,test_controller,verify_email,password_link,all_users,my_user,my_user_del,user_address,save_user_address,editmyaccount };
