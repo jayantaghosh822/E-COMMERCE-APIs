@@ -202,7 +202,7 @@ const my_user_del = async(req,res)=>{
 }
 
 const user_address = async(req,res)=>{
-  console.log('user_id',req.params.user_id);
+  console.log('user_id_address',req.params.user_id);
   const user_id = req.params.user_id;
   const finduseraddress = await address.findOne({userid:user_id});
   if(finduseraddress){
