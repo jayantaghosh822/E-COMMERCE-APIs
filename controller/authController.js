@@ -205,7 +205,7 @@ const user_address = async(req,res)=>{
   console.log('user_id_address',req.params.user_id);
   const user_id = req.params.user_id;
   const finduseraddress = await address.findOne({userid:user_id});
-  if(finduseraddress){
+  if(finduseraddress!=null){
     console.log(finduseraddress);
     return res.status(200).send({
       finduseraddress
