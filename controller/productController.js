@@ -409,7 +409,7 @@ if(existing_product==null && req.body.formData.name!=null ){
 
 const product_by_cat_slug = async(req,res)=>{
       const cat_slug = req.headers.cat_slug;
-
+      const page = parseInt(req.headers.page_no) || 1;
       //console.log('my-slug',cat_slug);
       try{
         const get_categories = await category.findOne({slug:cat_slug});
@@ -419,7 +419,17 @@ const product_by_cat_slug = async(req,res)=>{
             const get_products = await product.find({ category: cat_id });
             if(get_products){
                 //console.log(get_products);
-                res.status(200).json({ message: 'Product Found successfully', data: get_products });
+                // const page = parseInt(req.query.page) || 1;
+                const limit = 2; // Number of products per page
+                const startIndex = (page - 1) * limit;
+                const endIndex = page * limit;
+        
+                const filteredProductIds = get_products.slice(startIndex, endIndex);
+        
+                const filtered_products = await product.find({ _id: { $in: filteredProductIds } });
+        
+                res.status(200).json({ message: 'Product Found successfully', data: filtered_products ,currentPage: page,
+                totalPages: Math.ceil(get_products.length / limit) });
             }
         }
       }
@@ -438,6 +448,7 @@ const filter_products = async(req,res)=>{
     const query = req.query;
     //console.log(brands);
     //console.log(colors);
+    const page = parseInt(req.query.page_no) || 1;
     const cat_id = await category.findOne({slug:product_category});
     if(cat_id){
       //console.log(cat_id);
@@ -498,9 +509,19 @@ try {
     // console.log('color_query',my_colorVariants);
     console.log('final_query',productIds);
     }
- const filtered_products = await product.find({_id:{$in:productIds}});
- console.log('my_filtered_products',filtered_products);
- res.status(200).json({ message: 'Product Found successfully', data: filtered_products });
+
+ 
+    const limit = 2; // Number of products per page
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+
+    const filteredProductIds = productIds.slice(startIndex, endIndex);
+
+    const filtered_products = await product.find({ _id: { $in: filteredProductIds } });
+//  const filtered_products = await product.find({_id:{$in:productIds}});
+//  console.log('my_filtered_products',filtered_products);
+ res.status(200).json({ message: 'Product Found successfully', data: filtered_products ,currentPage: page,
+ totalPages: Math.ceil(productIds.length / limit) });
 } catch (error) {
     console.error('Error filtering color variants:', error);
     throw error;
