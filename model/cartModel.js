@@ -11,13 +11,14 @@ const CartSchema = new mongoose.Schema(
         required:true,
     },
     size:{
-    type:String,
-    required:true,
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'Sizes' ,
    },
    quan:{
     type:Number,
     required:true,
    },
+   
   
 }
 

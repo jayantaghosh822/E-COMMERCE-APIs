@@ -6,6 +6,9 @@ app.use(cors({
     methods: ['GET','POST','DELETE','UPDATE','PUT','PATCH']
 }));
 
+const productModel = require('../model/productModel.js');
+// var formidable = require('formidable');
+const product = productModel.Product;
 
 const brandModel = require('../model/brandModel.js');
 
@@ -46,8 +49,27 @@ if(existing_brand==null && slug!=null && name!=null ){
     })
 }
 }
+const categoryModel = require('../model/categoryModel.js');
+
+const category = categoryModel.Category;
 const all_brands = async(req,res) =>{
-   const all_brands = await brand.find();
+   const cat_slug = req.headers.cat_slug;
+   let categoryidbyslug = await category.findOne({slug:cat_slug});
+   let all_brands = null;
+   if(categoryidbyslug){
+//    console.log("cat_id" , categoryidbyslug);
+   categoryidbyslug = categoryidbyslug._id;
+   const products_brands_by_categories = await product.find({category:categoryidbyslug} ,{_id:0 , name:1 , brand:1});
+   const brand_ids = products_brands_by_categories.map((product)=>{
+         return product.brand;
+   });
+   all_brands = await brand.find({_id:{$in:brand_ids}},{name:1 , _id:1});
+   }else{
+    all_brands = await brand.find();
+   }
+
+
+   
    console.log(all_brands);
    return res.status(200).send({
     success:true,

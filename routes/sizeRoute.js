@@ -1,0 +1,25 @@
+// var path = require('path');
+// var filename = path.basename('/Users/Refsnes/demo_path.js');
+// const registerControllers = require('E:\\Mern ECommerce\\E-COMMERCE-APIs\\controller\\authController.js');
+const sizeModel = require('../model/sizeModel.js');
+const size = sizeModel.size;
+const token_middleware = require ('../middlewares/authMiddleware');
+const registerControllers = require('../controller/sizeController');
+const create_size = registerControllers.create_size;
+const all_size = registerControllers.all_size;
+const delete_size = registerControllers.delete_size;
+const get_size = registerControllers.get_size;
+const get_size_name_by_id = registerControllers.get_size_name_by_id;
+const update_size = registerControllers.update_size;
+const child_sizes =  registerControllers.child_sizes;
+var express = require('express');
+const router = express.Router();
+router.post('/create-size',create_size);
+router.get('/all-sizes',all_size);
+router.delete('/size-delete',delete_size);
+router.get('/get-size',get_size);
+router.get('/get-size-name',get_size_name_by_id);
+router.put('/update-size',update_size);
+router.get('/child-sizes',child_sizes);
+
+module.exports = {router};

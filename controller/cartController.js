@@ -7,9 +7,17 @@ app.use(cors({
 }));
 const cartModel = require('../model/cartModel.js');
 const cart = cartModel.Cart;
+
+
+const size = require('../model/sizeModel.js');
+const sizes = size.Size;
+
+
 const add_to_cart = async(req,res)=>{
-    console.log(req.body);
-    console.log(req.user);
+    console.log('request');
+    console.log('request',req);
+    console.log('request');
+    // console.log(req.user);
     const user_id = req.user._id;
     let {product,size,quan} = req.body;
     try{
@@ -65,11 +73,12 @@ const add_to_cart = async(req,res)=>{
    
 }
 const get_cart_items = async(req,res)=>{
-    console.log(req.user);
+    // console.log(req.user);
     try{
-        const cart_items = await cart.find({user_id:req.user._id}).populate('product');
+        const cart_items = await cart.find({user_id:req.user._id}).populate('product').populate('size');
         if(cart_items){
-            console.log(cart_items);
+          // const size_details = await casizesrt.find({_id:req.user._id}).populate('product');
+            // console.log(cart_items);
             res.status(201).send({
               success:true,
               items:cart_items,
@@ -86,7 +95,9 @@ const get_cart_items = async(req,res)=>{
 const update_cart_items = async (req, res) => {
     const item_id = req.params.item_id;
     const quan = req.body.quantity;
-  
+    if(!item_id || !quan){
+      return res.status(200).send({ message: 'Item updated in cart' });
+    }
     try {
       const get_item = await cart.findById(item_id);
       if (get_item) {
@@ -119,6 +130,28 @@ const update_cart_items = async (req, res) => {
     }
   };
 
+  const remove_cart_item = async(req,res)=>{
+    const item_id = req.params.item_id;
+    console.log('item_id',item_id);
+    try{
+      result = await cart.deleteOne({ _id: item_id });
+      console.log(result);
+      if(result){
+        return res.status(200).send({ 
+        success: true,
+        message: "cart item deleted"
+        });
+      }
+    }
+    catch(err){
+      console.log(err)
+      return res.status(404).send({ 
+      success: true,
+      message: "something went wrong"
+        });
+    }
+  }
+
   const delete_cart_items = async(req,res)=>{
     const user_id = req.user._id;
     console.log(user_id);
@@ -145,4 +178,4 @@ const update_cart_items = async (req, res) => {
 
   }
   
-module.exports = {add_to_cart,get_cart_items,update_cart_items,delete_cart_items};
+module.exports = {add_to_cart,get_cart_items,update_cart_items,remove_cart_item,delete_cart_items};

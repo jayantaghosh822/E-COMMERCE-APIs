@@ -21,8 +21,5 @@ router.get('/get-category',get_category);
 router.get('/get-category-name',get_category_name_by_id);
 router.put('/update-category',update_category);
 router.get('/child_categories',child_categories);
-<<<<<<< HEAD
+
 module.exports = {router};
-=======
-module.exports = {router};
->>>>>>> b8fa8d541a9066c2be125a4daa08793a5826b409

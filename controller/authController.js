@@ -21,22 +21,20 @@ const user = userModel.User;
 const usesrAddressModel = require('../model/addressModel.js');
 const address = usesrAddressModel.UserAddress;
 const registerController = async(req,res) => {
-//console.log("controller");
 
-    //console.log(req.body);
  existing_user=await user.findOne({email:req.body.email});
  console.log(existing_user);
 
- const {name,email,password,phone,address} = req.body;
- console.log(name);
- console.log(email);
- const role = 2;
- console.log(role);
+ const {firstname,lastname,email,password,phone} = req.body;
+//  console.log(name);
+//  console.log(email);
+const role = 2;
+const displayname = firstname;
  let newuser="";
 if(!existing_user){
 
-newuser = await new user({name,email,password,phone,address,role}).save();
-console.log(newuser);
+newuser = await new user({firstname,lastname,email,displayname,password,phone,role}).save();
+
 res.status(201).send({
   success:true,
   message:"user registered",
@@ -49,14 +47,6 @@ else{
     message: "User aready exist with this email address"});
   // res.send('All is good!');
 }
-// user.name = 'argha';
-// user.email = "fsdf@gmail.com";
-// user.password = "abcc";
-// user.phone = "654646545";
-// user.address = "sdgsdsgsdg";
-// const doc = await user.save();
-
-
 
 }
 
@@ -72,51 +62,48 @@ const get_user_by_id = async(req,res)  => {
     
 }
 
-const login = async(req,res) =>{
-  //console.log(req);
-const user_email = req.body.lemail;
-console.log(user_email);
-const user_pass = req.body.lpass;
-console.log(user_pass);
-try { 
-   //console.log(process.env.TOKEN_SECRET);
-    // check if the user exists 
-    const my_user = await user.findOne({ email: user_email }); 
-    if (my_user) { 
-      //check if password matches 
-      const result = user_pass === my_user.password; 
-      if (result) { 
-        try{
-      const token = JWT.sign({_id:my_user._id}, process.env.TOKEN_SECRET, { expiresIn: '1d' });
-      console.log(token);
-      res.status(200).send({
-        success:true,
-        message:"user logedin",
-        user:{
-        name:my_user.name,
-        email:my_user.email,
-        id:my_user._id,
-        token:token,
-        },
-       
-    })
-        }
-        catch(error){
-            console.log(error);
-        }
-      
-       
-        
+const login = async (req, res) => {
+  const user_email = req.body.lemail;
+  const user_pass = req.body.lpass;
+
+  try { 
+      // Check if the user exists
+      const my_user = await user.findOne({ email: user_email });
+
+      if (my_user) { 
+          // Check if password matches
+          const result = user_pass === my_user.password;
+
+          if (result) { 
+              try {
+                  const token = JWT.sign({ _id: my_user._id }, process.env.TOKEN_SECRET, { expiresIn: '1d' });
+
+                  res.status(200).send({
+                      success: true,
+                      message: "User logged in",
+                      user: {
+                          name: my_user.displayname || 'N/A', // Provide default values if fields are undefined
+                          email: my_user.email || 'N/A',
+                          id: my_user._id,
+                          token: token,
+                      },
+                  });
+              } catch (error) {
+                  console.error("Token generation error:", error);
+                  res.status(500).json({ success: false, error: "Internal server error" });
+              }
+          } else { 
+              res.status(401).json({ success: false, error: "Password doesn't match" }); 
+          } 
       } else { 
-        res.status(200).json({success:false, error: "password doesn't match" }); 
+          res.status(404).json({ success: false, error: "User doesn't exist" }); 
       } 
-    } else { 
-      res.status(200).json({success:false,error: "User doesn't exist" }); 
-    } 
   } catch (error) { 
-    res.status(200).json({ error }); 
+      console.error("Database query error:", error);
+      res.status(500).json({ success: false, error: "Internal server error" }); 
   } 
-}
+};
+
 
 const test_controller = (req,res) =>{
     try
@@ -196,7 +183,7 @@ const all_users = async(req,res) =>{
 }
 
 const my_user = async(req,res)=>{
-  const user_id = req.headers.user_id;
+  const user_id = req.params.user_id;
   console.log(req.headers.user_id);
  const my_user = await user.findOne({ _id: user_id }); 
   console.log(my_user);
@@ -212,10 +199,10 @@ const my_user_del = async(req,res)=>{
 }
 
 const user_address = async(req,res)=>{
-  // console.log('user_id',req.params.user_id);
+  console.log('user_id_address',req.params.user_id);
   const user_id = req.params.user_id;
   const finduseraddress = await address.findOne({userid:user_id});
-  if(finduseraddress){
+  if(finduseraddress!=null){
     console.log(finduseraddress);
     return res.status(200).send({
       finduseraddress
@@ -239,6 +226,7 @@ const save_user_address = async(req,res)=>{
       const update_user = await address.findByIdAndUpdate(finduseraddress._id,{firstname,lastname,streetAddress1,streetAddress2,city,state,zip,phone,country,email},{ new: true });
       if(update_user){
         return res.status(200).send({
+          success:true,
           message:"address updated successfully"
         })
       }
@@ -249,6 +237,7 @@ const save_user_address = async(req,res)=>{
       if(register_address){
         console.log(register_address);
         return res.status(200).send({
+          success:true,
           message:"address saved successfully"
         })
       }
@@ -261,4 +250,18 @@ const save_user_address = async(req,res)=>{
     })
   }
 }
-module.exports = { registerController , get_user_by_id ,login ,test_controller,verify_email,password_link,all_users,my_user,my_user_del,user_address,save_user_address };
+
+const editmyaccount = async(req , res) =>{
+console.log(req.body);
+const userid = req.params.user_id;
+const {email , password , firstname , lastname, displayname} = req.body;
+const user_details = await user.findByIdAndUpdate(userid, {email , password , firstname , lastname, displayname}, { new: true });
+if(user_details){
+  console.log(user_details);
+  return res.status(200).send({
+    success:true,
+    message:"account updated successfully"
+  })
+}
+}
+module.exports = { registerController , get_user_by_id ,login ,test_controller,verify_email,password_link,all_users,my_user,my_user_del,user_address,save_user_address,editmyaccount };
