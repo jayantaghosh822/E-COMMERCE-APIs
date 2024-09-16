@@ -170,7 +170,7 @@ const del_product = async(req,res) =>{
  }
 
  const get_product_by_slug = async (req, res) => {
-    // console.log('slug', req.params.slug);
+    console.log('slug', req.params.slug);
     let pro_slug = req.params.slug;
     let pro_id = '';
     const imageDataArray = [];
@@ -188,7 +188,7 @@ const del_product = async(req,res) =>{
         if (pro_id !== "") {
             const productvarImages = await productImages.find({ product: { $in: pro_id } }).select("photo");
             
-            // console.log('productimages', productvarImages);
+            console.log('productimages', productvarImages);
             
             // Iterate over the products and extract photo data
             productvarImages.forEach(product => {
@@ -201,7 +201,7 @@ const del_product = async(req,res) =>{
                  select: 'name', // only select the _id field of the Size document
              });
             if(size_pro_find){
-                // console.log(size_pro_find);
+                console.log(size_pro_find);
             }
         }
         const responseData = {
