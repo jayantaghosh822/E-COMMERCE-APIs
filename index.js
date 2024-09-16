@@ -1,5 +1,4 @@
-// import express from 'express';
-// import connect_db from './config/db';
+
 var express = require('express');
 var app = express();
 
