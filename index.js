@@ -6,23 +6,7 @@ var app = express();
 
 
 
-//   // Handle the event
-//   switch (event.type) {
-//     case 'checkout.session.completed':
-//       const paymentIntentSucceeded = event.data.object;
-//       console.log('checkout.session.completed');
-//       console.log(event);
-//       console.log('metadata',paymentIntentSucceeded.metadata);
-//       // Then define and call a function to handle the event payment_intent.succeeded
-//       break;
-//     // ... handle other event types
-//     default:
-//       console.log(`Unhandled event type ${event.type}`);
-//   }
 
-//   // Return a 200 response to acknowledge receipt of the event
-//   response.send();
-// });
 
 
 var bodyParser = require('body-parser');
