@@ -211,7 +211,7 @@ const del_product = async(req,res) =>{
         };
         return res.status(200).send(responseData);
     } catch (err) {
-        // console.log(err);
+        console.log(err);
         return res.status(500).send('Internal Server Error');
     }
 }
