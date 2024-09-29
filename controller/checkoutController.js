@@ -83,8 +83,8 @@ const payment = async (req, res) => {
                 user_id :JSON.stringify(user_id),
               },
             mode: "payment",
-            success_url: "http://localhost:3000/successful-payment?session_id={CHECKOUT_SESSION_ID}",
-            cancel_url: "http://localhost:3000/cart",
+            success_url: "https://thriving-mandazi-2580ba.netlify.app/successful-payment?session_id={CHECKOUT_SESSION_ID}",
+            cancel_url: "https://thriving-mandazi-2580ba.netlify.app/cart",
             shipping_options: [
               {
                   shipping_rate_data: {
@@ -177,7 +177,7 @@ const stripepaymenstatatuswebhook = async(request,response)=>{
   // const buffer = Buffer.from(jsonString, 'utf-8');
   // console.log(buffer);
   const sig = request.headers['stripe-signature'];
-  const endpointSecret = "whsec_7e2d8f6798f66b5eb6e64f0d5167f003565e5364166e5e7542732271c2897c4f";
+  const endpointSecret = "whsec_8j0qTj9uLdpEANedxU3f6MrCsYslDvmh";
   // 1mwhsec_7e2d8f6798f66b5eb6e64f0d5167f003565e5364166e5e7542732271c2897c4f
   let event;
 
