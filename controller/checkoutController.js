@@ -26,36 +26,46 @@ const payment = async (req, res) => {
     try {
         let order_details = req.body.cartItems;
         let shippingCharge = req.body.shippingCharge;
-        const lineitems = order_details.map((product) => ({
+        const lineitems = order_details.map((cart) => ({
             price_data: {
                 currency: "inr",
                 product_data: {
-                    name: product.product.name,
+                    name: cart.product.name,
+                    metadata:{
+                      product_id: cart.product._id,
+                      size: cart.size.name?cart.size.name:'', 
+                      cart_item_id: cart._id
+                    },
                 },
                
-                unit_amount: product.product.price * 100,
+                unit_amount: cart.product.price * 100,
             },
-            quantity: product.quan
+            quantity: cart.quan
         }));
-        lineitems.push({
-          price_data: {
-            currency: "inr",
-            product_data: {
-              name: "Shipping",
-            },
-            unit_amount: shippingCharge*100, // Shipping charge in cents
-          },
-          quantity: 1, // Typically, quantity is 1 for shipping
-        });
-      //console.log(order_details);
-      order_details = order_details.map((cart)=>({
-        // product_id:cart.product._id,
-        product_name:cart.product.name,
-        unit_amount: cart.product.price,
-        quantity: cart.quan,
-        size:cart.size,       
-        // cart_id : cart._id
-      }));
+        // lineitems.push({
+        //   price_data: {
+        //     currency: "inr",
+        //     product_data: {
+        //       name: "Shipping",
+        //     },
+        //     unit_amount: shippingCharge*100, // Shipping charge in cents
+        //   },
+        //   quantity: 1, // Typically, quantity is 1 for shipping
+        // });
+      // console.log(lineitems);
+      // lineitems
+      // return;
+      // order_details = order_details.map((cart)=>({
+      //   // product_id:cart.product._id,
+      //   product_name:cart.product.name,
+      //   unit_amount: cart.product.price,
+      //   quantity: cart.quan,
+      //   size:cart.size.name?cart.size.name:'',   
+      //   metadata: {
+      //     product_id: cart.product._id, // Example product ID
+      //   },    
+      //   // cart_id : cart._id
+      // }));
         order_details.user_id = user_id;
         console.log("ordr detAILS:",order_details);
         // const order_item = new order({order_details,user_id});
@@ -70,21 +80,36 @@ const payment = async (req, res) => {
             payment_method_types: ["card"],
             line_items: lineitems,
             metadata:{
-                order :JSON.stringify(order_details),
                 user_id :JSON.stringify(user_id),
               },
             mode: "payment",
             success_url: "http://localhost:3000/successful-payment?session_id={CHECKOUT_SESSION_ID}",
             cancel_url: "http://localhost:3000/cart",
+            shipping_options: [
+              {
+                  shipping_rate_data: {
+                      display_name: 'Standard Shipping',
+                      type: 'fixed_amount',
+                      fixed_amount: {
+                          amount: 12000, // Shipping charge in smallest currency unit (e.g., 5000 = ₹50.00)
+                          currency: 'inr',
+                      },
+                      delivery_estimate: {
+                          minimum: { unit: 'business_day', value: 3 },
+                          maximum: { unit: 'business_day', value: 5 },
+                      },
+                  },
+              },
+          ],
         });
 
         if (session) {
             console.log(session);
             // Assuming you have a function to delete cart items
            // await deleteCartItems(req.params.userId); // Call your delete cart items function here
-            return res.status(200).send({
-                session
-            });
+            // return res.status(200).send({
+            //     session
+            // });
         }
     } catch (error) {
         console.error("Error processing payment:", error);
@@ -92,16 +117,7 @@ const payment = async (req, res) => {
     }
 }
 
-// async function deleteCartItems(userId) {
-//     try {
-//         // Your logic to delete cart items for the given userId
-//         // Example: await Cart.deleteMany({ userId: userId });
-//         console.log("Cart items deleted for user ID:", userId);
-//     } catch (error) {
-//         console.error("Error deleting cart items:", error);
-//         throw error; // Handle the error or throw it further
-//     }
-// }
+
 
 const payment_status= async(req,res) =>{
 
@@ -113,13 +129,21 @@ const session = await stripe.checkout.sessions.retrieve(
 // console.log("ordered_items",JSON.parse(session.metadata.order));
 // console.log("payment_status",(session));
 let payment_status=false;
-let items = {};
+let items = {
+  items:null,
+  total:0
+};
 if(session){
+  console.log("stripe session",session);
     payment_status = session.payment_status;
     const date = new Date(session.created * 1000);
     if(payment_status=='paid'){
-        items = JSON.parse(session.metadata.order);
-        return res.status(200).send({ payment_status:true , date:date, metadata:items });
+      const line_items = await stripe.checkout.sessions.listLineItems(session_id);
+      console.log('line141',session.metadata.order);
+        items.items = (line_items);
+        items.total = JSON.parse(session.amount_total);
+        // return;
+        return res.status(200).send({ payment_status:true , date:date, order_details:items });
     }else{
         return res.status(200).send({ payment_status:false ,date:date, metadata:items });
     }
@@ -170,15 +194,36 @@ const stripepaymenstatatuswebhook = async(request,response)=>{
   switch (event.type) {
     case 'checkout.session.completed':
       const paymentIntentSucceeded = event.data.object;
-      console.log('checkout.session.completed');
+      // console.log('checkout.session.completed');
       console.log(event);
-      console.log('metadata',paymentIntentSucceeded.metadata);
+      // console.log('metadata',paymentIntentSucceeded);
       if(paymentIntentSucceeded.payment_status == 'paid'){
-        console.log('metadata', JSON.parse(paymentIntentSucceeded.metadata.order));
-        const order_details = paymentIntentSucceeded.metadata.order;
-        const user_id = paymentIntentSucceeded.metadata.user_id;
+        const session_id = paymentIntentSucceeded.id; 
+        const line_items = await stripe.checkout.sessions.listLineItems(session_id, {
+          expand: ['data.price.product'],
+        });
+        console.log('line_items',line_items);
+        const order_details=[];
+        const cart_item_ids = [];
+        line_items.data.forEach(item=>{
+          let price = item.price;
+          console.log(price);
+          cart_item_ids.push(price.product.metadata.cart_item_id);
+          order_details.push({product_metadata:price.product.metadata,name:item.description,total:item.amount_total,quan:item.quantity});
+          
+        });
+        console.log('cart ids are', cart_item_ids);
+        // console.log('order details', paymentIntentSucceeded.metadata);
+        // const order_details =  JSON.parse(paymentIntentSucceeded.metadata.order);
+        console.log('order details', order_details);
+        const user_id = JSON.parse(paymentIntentSucceeded.metadata.user_id);
+        console.log('userID', user_id);
         const order_item = new order({order_details,user_id});
-        const result =  await order_item.save();
+        const order_save_status =  await order_item.save();
+        if(order_save_status){
+          console.log(order_save_status);
+          await cart.deleteMany({ user_id: user_id });
+        }
       }
       // Then define and call a function to handle the event payment_intent.succeeded
       break;
